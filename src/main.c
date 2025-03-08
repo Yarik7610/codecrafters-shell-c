@@ -1,27 +1,34 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "main.h"
+#include "reader.h"
+#include "trim.h"
 
-#define MAX_INPUT_SIZE 100
 #define EXIT_COMMAND "exit 0"
 
 int main() {
   setbuf(stdout, NULL);
   
   char input[MAX_INPUT_SIZE];
-  int input_len = 1;
 
   while (1) {
     printf("$ ");
 
     fgets(input, MAX_INPUT_SIZE, stdin);
 
-    input_len = strlen(input);
-    input[input_len - 1] = '\0';
+    input[strlen(input) - 1] = '\0';
 
-    if (strcmp(input, EXIT_COMMAND) == 0) exit(0);
+    char *trimmed_input = trim(input);
+    if (*trimmed_input == '\0') continue;
 
-    printf("%s: command not found\n", input);
+    if (strcmp(trimmed_input, EXIT_COMMAND) == 0) exit(0);
+
+    char *command = read_command(trimmed_input);
+
+    printf("%s: command not found\n", trimmed_input);
+
+    free(command);
   }
 
   return 0;

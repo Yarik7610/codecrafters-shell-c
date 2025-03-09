@@ -7,6 +7,32 @@
 
 #define EXIT_COMMAND "exit 0"
 
+char *command = NULL;
+char *flags = NULL;
+int flags_count = 0;
+char **arguments = NULL;
+int arguments_count = 0;
+
+void free_globals() {
+  free(command);
+  command = NULL;
+
+  free(flags);
+  flags = NULL;
+
+  for (int i = 0; i < arguments_count; ++i) {
+    free(arguments[i]);
+    arguments[i] = NULL;
+  } 
+
+  free(arguments);
+  arguments = NULL;
+  
+  flags_count = 0;
+  arguments_count = 0;
+}
+
+
 int main() {
   setbuf(stdout, NULL);
   
@@ -24,11 +50,18 @@ int main() {
 
     if (strcmp(trimmed_input, EXIT_COMMAND) == 0) exit(0);
 
-    char *command = read_command(trimmed_input);
+    int is_error = read_input(trimmed_input);
+    if (is_error) exit(0);
+
+    printf("DEBUG, command: %s\n", command);
+    printf("DEBUG, flags: %s\n", flags);
+    for (int i = 0; i < arguments_count; ++i) {
+      printf("DEBUG, arguments[%d]: %s\n", i, arguments[i]);
+    }
 
     printf("%s: command not found\n", trimmed_input);
 
-    free(command);
+    free_globals();
   }
 
   return 0;

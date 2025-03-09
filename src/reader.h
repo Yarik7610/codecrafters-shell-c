@@ -1,1 +1,1 @@
-char* read_command(char *input);
+int read_input(char *input);

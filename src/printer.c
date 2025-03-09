@@ -1,5 +1,6 @@
 #include "printer.h"
 #include "command.h"
+#include <stdio.h>
 
 void print(char *command, char *flags, char *args[]) {
   Command command_type = get_command_type(command);

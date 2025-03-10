@@ -19,6 +19,10 @@ void read_command(char *input) {
   command[i] = '\0';  
 }
 
+int is_valid_char(char ch) {
+  return isalnum(ch) || ch == '_';
+}
+
 void read_input(char *input) {
   read_command(input);
   input += strlen(command);
@@ -40,9 +44,9 @@ void read_input(char *input) {
 
         flags[flags_count++] = input[i];
       }
-    } else if (isalnum(input[i])) {
+    } else if (is_valid_char(input[i])) {
       int argument_start_idx = i;
-      for (; isalnum(input[i]) && input[i] != '\0' && input[i] != '\n'; ++i);
+      for (; is_valid_char(input[i]) && input[i] != '\0' && input[i] != '\n'; ++i);
 
       int argument_len = i - argument_start_idx;
 

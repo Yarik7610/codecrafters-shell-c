@@ -1,7 +1,8 @@
 #include "command.h"
 #include "evaluator.h"
-#include <stdlib.h>
 #include "main.h"
+#include <ctype.h>
+#include <stdio.h>
 
 char** evaluate() {
   Command command_type = get_command_type();

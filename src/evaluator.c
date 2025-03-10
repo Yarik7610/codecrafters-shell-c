@@ -3,6 +3,7 @@
 #include "main.h"
 #include <ctype.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 char** evaluate() {
   Command command_type = get_command_type();

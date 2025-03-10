@@ -6,8 +6,6 @@
 #include "main.h"
 
 void read_command(char *input) {
-  if (strcmp(input, "exit 0") == 0) exit(0);
-
   int i;
   for (i = 0; !isspace(input[i]) && input[i] != '\0' && input[i] != '\n'; ++i);
 
@@ -33,7 +31,7 @@ int read_input(char *input) {
     if (input[i] == '-') {
       ++i;
 
-      for (; isalpha(input[i]) && input[i] != '\0' && input[i] != '\n'; ++i) {
+      for (; isalnum(input[i]) && input[i] != '\0' && input[i] != '\n'; ++i) {
         flags = realloc(flags, (flags_count + 1));
 
         if (!flags) {
@@ -45,7 +43,7 @@ int read_input(char *input) {
       }
     } else if (isalnum(input[i])) {
       int argument_start_idx = i;
-      for (; isalpha(input[i]) && input[i] != '\0' && input[i] != '\n'; ++i);
+      for (; isalnum(input[i]) && input[i] != '\0' && input[i] != '\n'; ++i);
 
       int argument_len = i - argument_start_idx;
 
@@ -66,7 +64,7 @@ int read_input(char *input) {
 
       arguments[arguments_count++] = argument;
     } else {
-      printf("Unknown option: %c\n", input[i]);
+      printf("Unknown char: %c\n", input[i]);
       return 1;
     }
   }

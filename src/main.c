@@ -4,8 +4,8 @@
 #include "main.h"
 #include "reader.h"
 #include "trim.h"
-
-#define EXIT_COMMAND "exit 0"
+#include "evaluator.h"
+#include "printer.h"
 
 char *command = NULL;
 char *flags = NULL;
@@ -48,18 +48,18 @@ int main() {
     char *trimmed_input = trim(input);
     if (*trimmed_input == '\0') continue;
 
-    if (strcmp(trimmed_input, EXIT_COMMAND) == 0) exit(0);
-
     int is_error = read_input(trimmed_input);
-    if (is_error) exit(0);
+    if (is_error) exit(1);
 
-    printf("DEBUG, command: %s\n", command);
-    printf("DEBUG, flags: %s\n", flags);
-    for (int i = 0; i < arguments_count; ++i) {
-      printf("DEBUG, arguments[%d]: %s\n", i, arguments[i]);
-    }
+    // printf("DEBUG, command: %s\n", command);
+    // printf("DEBUG, flags: %s\n", flags);
+    // for (int i = 0; i < arguments_count; ++i) {
+    //   printf("DEBUG, arguments[%d]: %s\n", i, arguments[i]);
+    // }
 
-    printf("%s: command not found\n", trimmed_input);
+    char **output = evaluate();
+    
+    print(output);
 
     free_globals();
   }

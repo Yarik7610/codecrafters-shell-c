@@ -7,6 +7,6 @@ typedef enum {
   Unknown
 } Command;
 
-Command get_command_type(char *command);
+Command get_command_type();
 
 #endif

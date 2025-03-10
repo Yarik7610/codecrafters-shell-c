@@ -20,7 +20,7 @@ void read_command(char *input) {
 }
 
 int is_valid_char(char ch) {
-  return isalnum(ch) || ch == '_';
+  return isalnum(ch) || ch == '_' || ch == '.';
 }
 
 void read_input(char *input) {

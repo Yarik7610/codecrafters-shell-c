@@ -11,7 +11,7 @@ void read_command(char *input) {
 
   command = malloc(i + 1);
   if (!command) {
-    perror("Command malloc failed");
+    perror("Command malloc failed\n");
     exit(1);
   }
 
@@ -19,7 +19,7 @@ void read_command(char *input) {
   command[i] = '\0';  
 }
 
-int read_input(char *input) {
+void read_input(char *input) {
   read_command(input);
   input += strlen(command);
 
@@ -33,7 +33,6 @@ int read_input(char *input) {
 
       for (; isalnum(input[i]) && input[i] != '\0' && input[i] != '\n'; ++i) {
         flags = realloc(flags, (flags_count + 1));
-
         if (!flags) {
           perror("Flags realloc failed");
           exit(1);
@@ -49,7 +48,7 @@ int read_input(char *input) {
 
       char *argument = malloc(argument_len + 1);
       if (!argument) {
-        perror("Argument malloc failed");
+        perror("Argument malloc failed\n");
         exit(1);
       }
 
@@ -65,7 +64,7 @@ int read_input(char *input) {
       arguments[arguments_count++] = argument;
     } else {
       printf("Unknown char: %c\n", input[i]);
-      return 1;
+      exit(1);
     }
   }
 
@@ -88,6 +87,4 @@ int read_input(char *input) {
 
     arguments[arguments_count] = NULL; 
   }
-
-  return 0;
 }

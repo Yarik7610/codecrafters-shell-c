@@ -4,9 +4,10 @@
 typedef enum {
   Exit,
   Echo,
+  Type,
   Unknown
 } Command;
 
-Command get_command_type();
+Command get_command_type(char *command);
 
 #endif

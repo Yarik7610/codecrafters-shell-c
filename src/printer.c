@@ -1,13 +1,10 @@
-#include "printer.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include "main.h"
+#include "printer.h"
 
-void print(char **output) {
+void print() {
   if (output == NULL) return;
 
-  for (int i = 0; output[i] != NULL; ++i) {
-    printf("%s ", output[i]);
-  }
-
-  printf("\n");
+  printf("%s\n", output);
 }

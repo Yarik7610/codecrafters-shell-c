@@ -1,1 +1,1 @@
-char** evaluate();
+void evaluate();

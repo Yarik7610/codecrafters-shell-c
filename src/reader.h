@@ -1,1 +1,1 @@
-int read_input(char *input);
+void read_input(char *input);

@@ -4,9 +4,13 @@
 #define MAX_INPUT_SIZE 100
 
 extern char *command;
+
 extern char *flags;
 extern int flags_count;
+
 extern char **arguments;
 extern int arguments_count;
+
+extern char *output;
 
 #endif

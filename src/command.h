@@ -6,7 +6,8 @@ typedef enum {
   Echo,
   Type,
   Pwd,
-  Unknown
+  Unknown,
+  Cd,
 } Command;
 
 Command get_command_type(char *command);

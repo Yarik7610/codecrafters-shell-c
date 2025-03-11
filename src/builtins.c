@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include "builtins.h"
 
-Command builtins[] = {Echo, Exit, Type, Pwd};
+Command builtins[] = {Echo, Exit, Type, Pwd, Cd};
 
 int is_builtin(Command command_type) {
   size_t builtins_len = sizeof(builtins) / sizeof(builtins[0]);

@@ -89,7 +89,7 @@ void evaluate_exit() {
 
 void evaluate_pwd() {
   if (arguments_count > 0) {
-    printf("No arguments should be passed");
+    printf("No arguments should be passed\n");
     return;
   }
 
@@ -113,9 +113,20 @@ void evaluate_unknown_command(char *input) {
   int external_program_status = system(input);
 
   if (external_program_status != 0) {
-    perror("External program error detected");
+    perror("External program error detected\n");
     exit(1);
   }
+}
+
+void evaluate_cd() {
+  if (arguments_count != 1) {
+    printf("Wrong arguments count\n");
+    return;
+  }
+
+  char success_flag = chdir(arguments[0]);
+
+  if (success_flag != 0) printf("%s: %s: No such file or directory\n", command, arguments[0]);
 }
 
 void evaluate(char *input) {
@@ -132,6 +143,9 @@ void evaluate(char *input) {
       evaluate_exit();
     case Pwd:
       evaluate_pwd();
+      break;
+    case Cd:
+      evaluate_cd();
       break;
     default:
       evaluate_unknown_command(input);

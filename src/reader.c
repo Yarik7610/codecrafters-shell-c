@@ -5,6 +5,10 @@
 #include "reader.h"
 #include "main.h"
 
+int is_valid_char(char ch) {
+  return isalnum(ch) || ch == '_' || ch == '.' || ch == '/' || ch == '-';
+}
+
 void read_command(char *input) {
   int i;
   for (i = 0; !isspace(input[i]) && input[i] != '\0' && input[i] != '\n'; ++i);
@@ -19,10 +23,6 @@ void read_command(char *input) {
   command[i] = '\0';  
 }
 
-int is_valid_char(char ch) {
-  return isalnum(ch) || ch == '_' || ch == '.';
-}
-
 void read_input(char *input) {
   read_command(input);
   input += strlen(command);
@@ -32,7 +32,7 @@ void read_input(char *input) {
   while (input[i] != '\0' && input[i] != '\n') {
     while (isspace(input[i]) && input[i] != '\0' && input[i] != '\n') ++i;
 
-    if (input[i] == '-') {
+    if (input[i] == '-' && i > 0 && isspace(input[i - 1])) {
       ++i;
 
       for (; isalnum(input[i]) && input[i] != '\0' && input[i] != '\n'; ++i) {

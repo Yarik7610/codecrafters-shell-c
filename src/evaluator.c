@@ -20,10 +20,6 @@ void evaluate_echo() {
 }
 
 void evaluate_type() {
-  if (flags_count != 0) {
-    printf("%s: wrong flags count\n", command); 
-    return;
-  }
   if (arguments_count != 1) {
     printf("%s: wrong arguments count\n", command); 
     return;
@@ -31,35 +27,25 @@ void evaluate_type() {
 
   Command argument_command_type = get_command_type(arguments[0]);
   
-  char* answer;
-  int should_free_answer = 0;
-
-  if (is_builtin(argument_command_type)) answer = " is a shell builtin";
-  else {
-    char* command_env_path = get_command_from_env_path(arguments[0]);
-    if (command_env_path) {
-      answer = malloc(strlen(" is ") + strlen(command_env_path) + 1);
-      if (!answer) {
-        perror("Type: answer malloc failed");
-        exit(1);
-      }
-
-      sprintf(answer, " is %s", command_env_path);
-
-      free(command_env_path);
-      should_free_answer = 1;
-    }
-    else answer = ": not found";
+  if (is_builtin(argument_command_type)) {
+    printf("%s is a shell builtin\n", arguments[0]);
+    return;
   }
 
-  printf("%s%s\n", arguments[0], answer);
+  char *command_env_path = get_command_from_env_path(arguments[0]);
+
+  if (command_env_path) {
+    printf("%s is %s\n", arguments[0], command_env_path);
+    free(command_env_path);
+  } else printf("%s: not found\n", arguments[0]);
 }
 
 void evaluate_exit() {
   if (flags_count != 0) {
-    printf("%s: wrong flags count\n", command); 
+    printf("%s: no flags should be provided\n", command); 
     return;
   }
+
   if (arguments_count != 1) {
     printf("%s: wrong arguments count\n", command); 
     return;
@@ -72,8 +58,9 @@ void evaluate_exit() {
       break;
     }
   }
+
   if (!is_arg_a_number) {
-    printf("%s: provide status code\n", command);
+    printf("%s: provide valid status code\n", command);
     return;
   }
 
@@ -89,14 +76,14 @@ void evaluate_exit() {
 
 void evaluate_pwd() {
   if (arguments_count > 0) {
-    printf("No arguments should be passed\n");
+    printf("%s: no arguments should be passed\n", command);
     return;
   }
 
   char pwd[MAX_FULL_PATH_LENGTH];   
 
   if (getcwd(pwd, sizeof(pwd)) == NULL) {
-    perror("getcwd error");
+    perror("getcwd error detected");
     exit(1);
   } 
   

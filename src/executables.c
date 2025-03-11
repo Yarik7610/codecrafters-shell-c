@@ -18,10 +18,9 @@ char* get_command_from_env_path(char *command) {
   }
  
   char *splitted_path = strtok(path_copy, ":");
+  char full_path[MAX_FULL_PATH_LENGTH]; 
 
   while (splitted_path != NULL) {
-    char full_path[MAX_FULL_PATH_LENGTH]; 
-
     snprintf(full_path, MAX_FULL_PATH_LENGTH, "%s/%s", splitted_path, command);
 
     if (access(full_path, X_OK) != -1) {

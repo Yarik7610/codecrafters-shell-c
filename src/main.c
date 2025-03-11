@@ -37,7 +37,7 @@ int main() {
    
     read_input(trimmed_input);
 
-    evaluate();
+    evaluate(trimmed_input);
 
     print();
 

@@ -107,7 +107,22 @@ void evaluate_exit() {
   exit(status_code);
 }
 
-void evaluate() {
+void evaluate_unknown_command(char *input) {
+  char* command_env_path = get_command_from_env_path(command);
+  if (!command_env_path) {
+    printf("%s: command not found\n", command);
+    return;
+  }
+
+  int external_program_status = system(input);
+
+  if (external_program_status != 0) {
+    perror("External program error detected");
+    exit(1);
+  }
+}
+
+void evaluate(char *input) {
   Command command_type = get_command_type(command);
 
   switch (command_type) {
@@ -119,8 +134,9 @@ void evaluate() {
       break;
     case Exit:
       evaluate_exit();
+      break;
     default:
-      printf("%s: command not found\n", command);
+      evaluate_unknown_command(input);
       break;
   }
 }

@@ -1,1 +1,1 @@
-void evaluate();
+void evaluate(char *input);

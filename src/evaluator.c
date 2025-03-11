@@ -111,7 +111,20 @@ void evaluate_cd() {
     return;
   }
 
-  char success_flag = chdir(arguments[0]);
+  char *dir_to_cd = arguments[0];
+
+  if (strlen(arguments[0]) == 1 && *arguments[0] == '~') {
+    char *home_path = getenv("HOME");
+
+    if (!home_path) {
+      printf("HOME environment variable was not found\n");
+      return;
+    }
+
+    dir_to_cd = home_path;
+  }
+
+  char success_flag = chdir(dir_to_cd);
 
   if (success_flag != 0) printf("%s: %s: No such file or directory\n", command, arguments[0]);
 }

@@ -6,7 +6,7 @@
 #include "main.h"
 
 int is_valid_char(char ch) {
-  return isalnum(ch) || ch == '_' || ch == '.' || ch == '/' || ch == '-';
+  return isalnum(ch) || ch == '_' || ch == '.' || ch == '/' || ch == '-' || ch == '~';
 }
 
 void read_command(char *input) {

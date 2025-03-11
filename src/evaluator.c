@@ -13,7 +13,7 @@ void evaluate_echo() {
   if (!arguments_count) return;
 
   for (int i = 0; i < arguments_count; ++i) {
-    printf("%s", arguments[i]);
+    printf("%s ", arguments[i]);
   }
 
   printf("\n");
@@ -87,6 +87,22 @@ void evaluate_exit() {
   exit(status_code);
 }
 
+void evaluate_pwd() {
+  if (arguments_count > 0) {
+    printf("No arguments should be passed");
+    return;
+  }
+
+  char pwd[MAX_FULL_PATH_LENGTH];   
+
+  if (getcwd(pwd, sizeof(pwd)) == NULL) {
+    perror("getcwd error");
+    exit(1);
+  } 
+  
+  printf("%s\n", pwd);
+}
+
 void evaluate_unknown_command(char *input) {
   char* command_env_path = get_command_from_env_path(command);
   if (!command_env_path) {
@@ -102,22 +118,6 @@ void evaluate_unknown_command(char *input) {
   }
 }
 
-// void evaluate_pwd() {
-//   if (arguments_count > 0) {
-//     printf("No arguments should be passed");
-//     return;
-//   }
-
-//   char pwd[MAX_FULL_PATH_LENGTH];   
-
-//   if (getcwd(pwd, sizeof(pwd)) == NULL) {
-//     perror("getcwd error");
-//     exit(1);
-//   } else {
-//     output = pwd;
-//   }
-// }
-
 void evaluate(char *input) {
   Command command_type = get_command_type(command);
 
@@ -130,6 +130,8 @@ void evaluate(char *input) {
       break;
     case Exit:
       evaluate_exit();
+    case Pwd:
+      evaluate_pwd();
       break;
     default:
       evaluate_unknown_command(input);

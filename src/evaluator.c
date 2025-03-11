@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include "command.h"
 #include "evaluator.h"
 #include "main.h"
@@ -11,24 +12,11 @@
 void evaluate_echo() {
   if (!arguments_count) return;
 
-  size_t total_output_len = 0;
-
   for (int i = 0; i < arguments_count; ++i) {
-    total_output_len += strlen(arguments[i]);
-  }
-  total_output_len += (arguments_count - 1);
-
-  output = malloc(total_output_len + 1);
-  if (!output) {
-    perror("Output malloc failed");
-    exit(1);
+    printf("%s", arguments[i]);
   }
 
-  output[0] = '\0'; 
-  for (int i = 0; i < arguments_count; i++) {
-    strcat(output, arguments[i]); 
-    if (i < arguments_count - 1) strcat(output, " "); 
-  }
+  printf("\n");
 }
 
 void evaluate_type() {
@@ -64,15 +52,7 @@ void evaluate_type() {
     else answer = ": not found";
   }
 
-  output = malloc(strlen(arguments[0]) + strlen(answer) + 1);
-  if (!output) {
-    perror("Output element malloc failed");
-    exit(1);
-  }
-
-  sprintf(output, "%s%s", arguments[0], answer);
-
-  if (should_free_answer) free(answer);
+  printf("%s%s\n", arguments[0], answer);
 }
 
 void evaluate_exit() {
@@ -121,6 +101,22 @@ void evaluate_unknown_command(char *input) {
     exit(1);
   }
 }
+
+// void evaluate_pwd() {
+//   if (arguments_count > 0) {
+//     printf("No arguments should be passed");
+//     return;
+//   }
+
+//   char pwd[MAX_FULL_PATH_LENGTH];   
+
+//   if (getcwd(pwd, sizeof(pwd)) == NULL) {
+//     perror("getcwd error");
+//     exit(1);
+//   } else {
+//     output = pwd;
+//   }
+// }
 
 void evaluate(char *input) {
   Command command_type = get_command_type(command);

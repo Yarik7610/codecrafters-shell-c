@@ -5,6 +5,7 @@ typedef enum {
   Exit,
   Echo,
   Type,
+  Pwd,
   Unknown
 } Command;
 

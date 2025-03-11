@@ -3,8 +3,8 @@
 #include <stdio.h>
 #include <unistd.h> 
 #include "executables.h"
+#include "main.h"
 
-#define MAX_FULL_PATH_LENGTH 1024
 
 char* get_command_from_env_path(char *command) {
   char *path = getenv("PATH");

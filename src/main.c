@@ -5,7 +5,6 @@
 #include "reader.h"
 #include "trim.h"
 #include "evaluator.h"
-#include "printer.h"
 #include "command.h"
 
 char *command = NULL;
@@ -15,8 +14,6 @@ int flags_count = 0;
 
 char **arguments = NULL;
 int arguments_count = 0;
-
-char *output = NULL;
 
 void free_globals();
 
@@ -39,8 +36,6 @@ int main() {
 
     evaluate(trimmed_input);
 
-    print();
-
     free_globals();
   }
 
@@ -62,9 +57,6 @@ void free_globals() {
   free(arguments);
   arguments = NULL;
 
-  free(output);
-  output = NULL;
-  
   flags_count = 0;
   arguments_count = 0;
 }

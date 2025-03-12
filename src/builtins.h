@@ -1,7 +1,7 @@
 #ifndef BUILTINS_H
 #define BUILTINS_H
 
-#include "command.h"
+#include "commands.h"
 
 extern Command builtins[];
 

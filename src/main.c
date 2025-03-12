@@ -5,7 +5,6 @@
 #include "reader.h"
 #include "trim.h"
 #include "evaluator.h"
-#include "command.h"
 
 char *command = NULL;
 

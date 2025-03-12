@@ -27,6 +27,63 @@ void read_command(char *input) {
   command[i] = '\0';  
 }
 
+void read_flags(char *input, int *i) {
+  ++(*i);
+  for (; isalnum(input[*i]) && input[*i] != '\0' && input[*i] != '\n'; ++(*i)) {
+    flags = realloc(flags, (flags_count + 1));
+    if (!flags) {
+      perror("Flags realloc failed");
+      exit(1);
+    }
+
+    flags[flags_count++] = input[*i];
+  }
+}
+
+void read_argument(char *input, int *i) {
+  int argument_start_idx = *i;
+  char quote_char;
+  int argument_len;
+
+  char temp_arg[MAX_INPUT_SIZE];
+  int temp_index = 0;
+
+  while (input[*i] != '\0' && input[*i] != '\n') {
+    if (input[*i] == '\'' || input[*i] == '\"') {
+      quote_char = input[(*i)++];
+
+      while (input[*i] != quote_char && input[*i] != '\0' && input[*i] != '\n') temp_arg[temp_index++] = input[(*i)++];
+
+      if (input[*i] == quote_char) ++(*i);
+      else {
+        printf("Wrong %c count detected\n", quote_char);
+        exit(1);
+      }
+
+    } else if (is_in_word_char(input[*i])) temp_arg[temp_index++] = input[(*i)++];
+    else break;
+  }
+
+  temp_arg[temp_index] = '\0';
+
+  char *argument = malloc(temp_index + 1);
+  if (!argument) {
+    perror("Argument malloc failed\n");
+    exit(1);
+  }
+
+  strncpy(argument, temp_arg, temp_index);
+  argument[temp_index] = '\0';
+
+  arguments = realloc(arguments, (arguments_count + 1) * sizeof(char*));
+  if (!arguments) {
+    perror("Arguments realloc failed");
+    exit(1);
+  }
+
+  arguments[arguments_count++] = argument;
+}
+
 void read_input(char *input) {
   read_command(input);
   input += strlen(command);
@@ -36,66 +93,8 @@ void read_input(char *input) {
   while (input[i] != '\0' && input[i] != '\n') {
     while (isspace(input[i]) && input[i] != '\0' && input[i] != '\n') ++i;
 
-    if (input[i] == '-' && i > 0 && isspace(input[i - 1])) {
-      ++i;
-
-      for (; isalnum(input[i]) && input[i] != '\0' && input[i] != '\n'; ++i) {
-        flags = realloc(flags, (flags_count + 1));
-        if (!flags) {
-          perror("Flags realloc failed");
-          exit(1);
-        }
-
-        flags[flags_count++] = input[i];
-      }
-    } 
-    else if (is_valid_char(input[i])) {
-      int argument_start_idx = i;
-      char quote_char;
-      int argument_len;
-
-      char temp_arg[MAX_INPUT_SIZE];
-      int temp_index = 0;
-
-      while (input[i] != '\0' && input[i] != '\n') {
-        if (input[i] == '\'' || input[i] == '\"') {
-          quote_char = input[i++];
-
-          while (input[i] != quote_char && input[i] != '\0' && input[i] != '\n') {
-            temp_arg[temp_index++] = input[i++];
-          }
-
-          if (input[i] == quote_char) ++i;
-          else {
-            printf("Wrong %c count detected\n", quote_char);
-            exit(1);
-          }
-
-        } else if (is_in_word_char(input[i])) temp_arg[temp_index++] = input[i++];
-        else break;
-      }
-
-      temp_arg[temp_index] = '\0';
-      argument_len = temp_index;
-
-      char *argument = malloc(argument_len + 1);
-      if (!argument) {
-        perror("Argument malloc failed\n");
-        exit(1);
-      }
-
-      strncpy(argument, temp_arg, argument_len);
-      argument[argument_len] = '\0';
-
-      arguments = realloc(arguments, (arguments_count + 1) * sizeof(char*));
-      if (!arguments) {
-        perror("Arguments realloc failed");
-        exit(1);
-      }
-
-      arguments[arguments_count++] = argument;
-    }
-
+    if (input[i] == '-' && i > 0 && isspace(input[i - 1])) read_flags(input, &i);
+    else if (is_valid_char(input[i])) read_argument(input, &i);
     else {
       printf("Unknown char: %c\n", input[i]);
       exit(1);

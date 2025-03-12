@@ -5,8 +5,12 @@
 #include "reader.h"
 #include "main.h"
 
-int is_valid_char(char ch) {
+int is_in_word_char(char ch) {
   return isalnum(ch) || ch == '_' || ch == '.' || ch == '/' || ch == '-' || ch == '~';
+}
+
+int is_valid_char(char ch) {
+  return is_in_word_char(ch) || ch == '\'' || ch == '\"';
 }
 
 void read_command(char *input) {
@@ -44,11 +48,35 @@ void read_input(char *input) {
 
         flags[flags_count++] = input[i];
       }
-    } else if (is_valid_char(input[i])) {
+    } 
+    else if (is_valid_char(input[i])) {
       int argument_start_idx = i;
-      for (; is_valid_char(input[i]) && input[i] != '\0' && input[i] != '\n'; ++i);
+      char quote_char;
+      int argument_len;
 
-      int argument_len = i - argument_start_idx;
+      char temp_arg[MAX_INPUT_SIZE];
+      int temp_index = 0;
+
+      while (input[i] != '\0' && input[i] != '\n') {
+        if (input[i] == '\'' || input[i] == '\"') {
+          quote_char = input[i++];
+
+          while (input[i] != quote_char && input[i] != '\0' && input[i] != '\n') {
+            temp_arg[temp_index++] = input[i++];
+          }
+
+          if (input[i] == quote_char) ++i;
+          else {
+            printf("Wrong %c count detected\n", quote_char);
+            exit(1);
+          }
+
+        } else if (is_in_word_char(input[i])) temp_arg[temp_index++] = input[i++];
+        else break;
+      }
+
+      temp_arg[temp_index] = '\0';
+      argument_len = temp_index;
 
       char *argument = malloc(argument_len + 1);
       if (!argument) {
@@ -56,7 +84,7 @@ void read_input(char *input) {
         exit(1);
       }
 
-      strncpy(argument, input + argument_start_idx, argument_len);
+      strncpy(argument, temp_arg, argument_len);
       argument[argument_len] = '\0';
 
       arguments = realloc(arguments, (arguments_count + 1) * sizeof(char*));
@@ -66,7 +94,9 @@ void read_input(char *input) {
       }
 
       arguments[arguments_count++] = argument;
-    } else {
+    }
+
+    else {
       printf("Unknown char: %c\n", input[i]);
       exit(1);
     }

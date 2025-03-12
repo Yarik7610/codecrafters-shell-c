@@ -10,7 +10,7 @@ int is_in_word_char(char ch) {
 }
 
 int is_valid_char(char ch) {
-  return is_in_word_char(ch) || ch == '\'' || ch == '\"';
+  return is_in_word_char(ch) || ch == '\'' || ch == '\"' || ch == '\\';
 }
 
 void read_command(char *input) {
@@ -61,6 +61,16 @@ void read_argument(char *input, int *i) {
       }
 
     } else if (is_in_word_char(input[*i])) temp_arg[temp_index++] = input[(*i)++];
+    else if (input[*i] == '\\') {
+      ++(*i);
+
+      if (input[*i] == '\0' || input[*i] == '\n') {
+        printf("Wrong backslash outside of quotes interpetation");
+        exit(1);
+      }
+
+      temp_arg[temp_index++] = input[(*i)++];
+    }
     else break;
   }
 

@@ -27,9 +27,7 @@ void read_flags(char *input, int *i) {
 }
 
 void read_argument(char *input, int *i) {
-  int argument_start_idx = *i;
   char quote_char;
-  int argument_len;
 
   char temp_arg[MAX_INPUT_SIZE];
   int temp_index = 0;

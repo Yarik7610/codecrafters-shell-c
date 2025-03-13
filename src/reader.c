@@ -15,7 +15,7 @@ int is_valid_char(char ch) {
 
 void read_command(char *input) {
   int i;
-  for (i = 0; !isspace(input[i]) && input[i] != '\0' && input[i] != '\n'; ++i);
+  for (i = 0; !isspace(input[i]) && input[i] != '\0'; ++i);
 
   command = malloc(i + 1);
   if (!command) {
@@ -29,7 +29,7 @@ void read_command(char *input) {
 
 void read_flags(char *input, int *i) {
   ++(*i);
-  for (; isalnum(input[*i]) && input[*i] != '\0' && input[*i] != '\n'; ++(*i)) {
+  for (; isalnum(input[*i]) && input[*i] != '\0'; ++(*i)) {
     flags = realloc(flags, (flags_count + 1));
     if (!flags) {
       perror("Flags realloc failed");
@@ -48,11 +48,18 @@ void read_argument(char *input, int *i) {
   char temp_arg[MAX_INPUT_SIZE];
   int temp_index = 0;
 
-  while (input[*i] != '\0' && input[*i] != '\n') {
+  while (input[*i] != '\0') {
     if (input[*i] == '\'' || input[*i] == '\"') {
       quote_char = input[(*i)++];
 
-      while (input[*i] != quote_char && input[*i] != '\0' && input[*i] != '\n') temp_arg[temp_index++] = input[(*i)++];
+      while (input[*i] != quote_char && input[*i] != '\0') {
+        if (input[*i] == '\\' && quote_char == '\"') {
+          char next_ch = input[*i + 1];
+          if (next_ch == '\\' || next_ch == '$' || next_ch == '\"') ++(*i);
+        }
+
+        temp_arg[temp_index++] = input[(*i)++];
+      }
 
       if (input[*i] == quote_char) ++(*i);
       else {
@@ -64,7 +71,7 @@ void read_argument(char *input, int *i) {
     else if (input[*i] == '\\') {
       ++(*i);
 
-      if (input[*i] == '\0' || input[*i] == '\n') {
+      if (input[*i] == '\0') {
         printf("Wrong backslash outside of quotes interpetation");
         exit(1);
       }
@@ -100,8 +107,8 @@ void read_input(char *input) {
 
   int i = 0;
 
-  while (input[i] != '\0' && input[i] != '\n') {
-    while (isspace(input[i]) && input[i] != '\0' && input[i] != '\n') ++i;
+  while (input[i] != '\0') {
+    while (isspace(input[i]) && input[i] != '\0') ++i;
 
     if (input[i] == '-' && i > 0 && isspace(input[i - 1])) read_flags(input, &i);
     else if (is_valid_char(input[i])) read_argument(input, &i);

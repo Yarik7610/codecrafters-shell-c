@@ -6,8 +6,6 @@
 #include "trim.h"
 #include "evaluator.h"
 
-char *command = NULL;
-
 char *flags = NULL;
 int flags_count = 0;
 
@@ -33,6 +31,10 @@ int main() {
    
     read_input(trimmed_input);
 
+    // for (int i = 0; i < arguments_count; ++i) {
+    //   printf("DEBUG arg[%d]: %s\n", i, arguments[i]);
+    // }
+
     evaluate(trimmed_input);
 
     free_globals();
@@ -43,9 +45,6 @@ int main() {
 
 
 void free_globals() {
-  free(command);
-  command = NULL;
-
   free(flags);
   flags = NULL;
 

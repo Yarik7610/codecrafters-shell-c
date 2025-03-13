@@ -18,9 +18,9 @@ Command get_command_type(char *command) {
 }
 
 void eval_echo() {
-  if (!arguments_count) return;
+  if (arguments_count <= 1) return;
 
-  for (int i = 0; i < arguments_count; ++i) {
+  for (int i = 1; i < arguments_count; ++i) {
     printf("%s ", arguments[i]);
   }
 
@@ -28,40 +28,47 @@ void eval_echo() {
 }
 
 void eval_type() {
-  if (arguments_count != 1) {
+  char *command = arguments[0];
+  char *first_command_argument = arguments[1];
+
+  if (arguments_count != 2) {
     printf("%s: wrong arguments count\n", command); 
     return;
   } 
 
-  Command argument_command_type = get_command_type(arguments[0]);
+  Command argument_command_type = get_command_type(first_command_argument);
   
   if (is_builtin(argument_command_type)) {
-    printf("%s is a shell builtin\n", arguments[0]);
+    printf("%s is a shell builtin\n", first_command_argument);
     return;
   }
 
-  char *command_env_path = get_command_from_env_path(arguments[0]);
+  char *command_env_path = get_command_from_env_path(first_command_argument);
 
   if (command_env_path) {
-    printf("%s is %s\n", arguments[0], command_env_path);
+    printf("%s is %s\n", first_command_argument, command_env_path);
     free(command_env_path);
-  } else printf("%s: not found\n", arguments[0]);
+  } else printf("%s: not found\n", first_command_argument);
 }
 
 void eval_exit() {
+  char *command = arguments[0];
+
   if (flags_count != 0) {
     printf("%s: no flags should be provided\n", command); 
     return;
   }
 
-  if (arguments_count != 1) {
+  if (arguments_count != 2) {
     printf("%s: wrong arguments count\n", command); 
     return;
   } 
 
   int is_arg_a_number = 1;
-  for (int i = 0; arguments[0][i] != '\0'; ++i) {
-    if (!isdigit(arguments[0][i])) {
+  char *first_command_argument = arguments[1];
+
+  for (int i = 0; first_command_argument[i] != '\0'; ++i) {
+    if (!isdigit(first_command_argument[i])) {
       is_arg_a_number = 0;
       break;
     }
@@ -72,7 +79,7 @@ void eval_exit() {
     return;
   }
 
-  int status_code = atoi(arguments[0]);
+  int status_code = atoi(command);
 
   if (status_code < 0 || status_code > 254) {
     printf("%s: status code must be between 0 and 254\n", command);
@@ -83,8 +90,8 @@ void eval_exit() {
 }
 
 void eval_pwd() {
-  if (arguments_count > 0) {
-    printf("%s: no arguments should be passed\n", command);
+  if (arguments_count > 1) {
+    printf("%s: no arguments should be passed\n", arguments[0]);
     return;
   }
 
@@ -99,14 +106,17 @@ void eval_pwd() {
 }
 
 void eval_cd() {
-  if (arguments_count != 1) {
-    printf("Wrong arguments count\n");
+  char *command = arguments[0];
+  char *first_command_argument = arguments[1];
+
+  if (arguments_count != 2) {
+    printf("%s: wrong arguments count\n", command);
     return;
   }
 
-  char *dir_to_cd = arguments[0];
+  char *dir_to_cd = first_command_argument;
 
-  if (strlen(arguments[0]) == 1 && *arguments[0] == '~') {
+  if (strlen(first_command_argument) == 1 && *first_command_argument == '~') {
     char *home_path = getenv("HOME");
 
     if (!home_path) {
@@ -119,10 +129,12 @@ void eval_cd() {
 
   char success_flag = chdir(dir_to_cd);
 
-  if (success_flag != 0) printf("%s: %s: No such file or directory\n", command, arguments[0]);
+  if (success_flag != 0) printf("%s: %s: No such file or directory\n", command, first_command_argument);
 }
 
 void eval_unknown_command(char *input) {
+  char *command = arguments[0];
+
   char* command_env_path = get_command_from_env_path(command);
   if (!command_env_path) {
     printf("%s: command not found\n", command);

@@ -13,20 +13,6 @@ int is_valid_char(char ch) {
   return is_in_word_char(ch) || ch == '\'' || ch == '\"' || ch == '\\';
 }
 
-void read_command(char *input) {
-  int i;
-  for (i = 0; !isspace(input[i]) && input[i] != '\0'; ++i);
-
-  command = malloc(i + 1);
-  if (!command) {
-    perror("Command malloc failed\n");
-    exit(1);
-  }
-
-  strncpy(command, input, i);
-  command[i] = '\0';  
-}
-
 void read_flags(char *input, int *i) {
   ++(*i);
   for (; isalnum(input[*i]) && input[*i] != '\0'; ++(*i)) {
@@ -72,7 +58,7 @@ void read_argument(char *input, int *i) {
       ++(*i);
 
       if (input[*i] == '\0') {
-        printf("Wrong backslash outside of quotes interpetation");
+        printf("Wrong backslash outside of quotes");
         exit(1);
       }
 
@@ -102,9 +88,6 @@ void read_argument(char *input, int *i) {
 }
 
 void read_input(char *input) {
-  read_command(input);
-  input += strlen(command);
-
   int i = 0;
 
   while (input[i] != '\0') {

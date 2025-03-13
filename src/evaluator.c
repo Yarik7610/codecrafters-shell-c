@@ -3,7 +3,7 @@
 #include "main.h"
 
 void evaluate(char *input) {
-  Command command_type = get_command_type(command);
+  Command command_type = get_command_type(arguments[0]);
 
   switch (command_type) {
     case Echo:

@@ -1,1 +1,0 @@
-void read_input(char *input);

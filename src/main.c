@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "main.h"
-#include "reader.h"
+#include "parser.h"
 #include "trim.h"
 #include "evaluator.h"
 
@@ -11,6 +11,9 @@ int flags_count = 0;
 
 char **arguments = NULL;
 int arguments_count = 0;
+
+char *stdout_file_path = NULL;
+char *stderr_file_path = NULL;
 
 void free_globals();
 
@@ -29,11 +32,7 @@ int main() {
     char *trimmed_input = trim(input);
     if (*trimmed_input == '\0') continue;
    
-    read_input(trimmed_input);
-
-    // for (int i = 0; i < arguments_count; ++i) {
-    //   printf("DEBUG arg[%d]: %s\n", i, arguments[i]);
-    // }
+    parse_input(trimmed_input);
 
     evaluate(trimmed_input);
 
@@ -54,6 +53,11 @@ void free_globals() {
   } 
   free(arguments);
   arguments = NULL;
+
+  free(stdout_file_path);
+  stdout_file_path = NULL;
+  free(stderr_file_path);
+  stderr_file_path = NULL;
 
   flags_count = 0;
   arguments_count = 0;

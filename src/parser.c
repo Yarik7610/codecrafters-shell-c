@@ -2,18 +2,14 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
-#include "reader.h"
+#include "parser.h"
 #include "main.h"
 
 int is_in_word_char(char ch) {
   return isalnum(ch) || ch == '_' || ch == '.' || ch == '/' || ch == '-' || ch == '~';
 }
 
-int is_valid_char(char ch) {
-  return is_in_word_char(ch) || ch == '\'' || ch == '\"' || ch == '\\';
-}
-
-void read_flags(char *input, int *i) {
+void parse_flags(char *input, int *i) {
   ++(*i);
   for (; isalnum(input[*i]) && input[*i] != '\0'; ++(*i)) {
     flags = realloc(flags, (flags_count + 1));
@@ -26,7 +22,47 @@ void read_flags(char *input, int *i) {
   }
 }
 
-void read_argument(char *input, int *i) {
+void parse_redirect_file_path(char *input, int *i) {
+  char **redirect_file_path;
+  
+  char file_descriptor = input[*i];
+  if (file_descriptor == '>' || file_descriptor == '1') redirect_file_path = &stdout_file_path;
+  else if (file_descriptor == '2') redirect_file_path = &stderr_file_path;
+  else {
+    printf("Wrong redirect file descriptor provided\n");
+    exit(1);
+  }
+
+  int offset = isdigit(file_descriptor) ? 2 : 1;
+  (*i) += offset; 
+
+  while (isspace(input[*i]) && input[*i] != '\0') ++(*i);
+
+  if (input[*i] == '\0') {
+    printf("Redirect file path wasn't provided\n");
+    exit(1);
+  }
+
+  int file_path_start_idx = *i;
+
+  while (!isspace(input[*i]) && input[*i] != '\0') ++(*i);
+
+  int file_path_len = *i - file_path_start_idx;
+
+  *redirect_file_path = malloc(file_path_len + 1);
+  if (!*redirect_file_path) {
+    perror("Redirect file path malloc failed");
+    exit(1);
+  }
+
+  for (int j = 0; j < file_path_len; ++j) {
+    (*redirect_file_path)[j] = input[file_path_start_idx++];
+  }
+
+  (*redirect_file_path)[file_path_len] = '\0';
+}
+
+void parse_argument(char *input, int *i) {
   char quote_char;
 
   char temp_arg[MAX_INPUT_SIZE];
@@ -85,18 +121,15 @@ void read_argument(char *input, int *i) {
   arguments[arguments_count++] = argument;
 }
 
-void read_input(char *input) {
+void parse_input(char *input) {
   int i = 0;
 
   while (input[i] != '\0') {
     while (isspace(input[i]) && input[i] != '\0') ++i;
 
-    if (input[i] == '-' && i > 0 && isspace(input[i - 1])) read_flags(input, &i);
-    else if (is_valid_char(input[i])) read_argument(input, &i);
-    else {
-      printf("Unknown char: %c\n", input[i]);
-      exit(1);
-    }
+    if (input[i] == '-' && i > 0 && isspace(input[i - 1])) parse_flags(input, &i);
+    else if (input[i] == '>' || (isdigit(input[i]) && input[i+1] == '>')) parse_redirect_file_path(input, &i);
+    else parse_argument(input, &i);
   }
 
   if (flags_count > 0) {

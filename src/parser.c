@@ -29,7 +29,7 @@ void parse_redirect_file_path(char *input, int *i) {
   if (file_descriptor == '>' || file_descriptor == '1') redirect_file_path = &stdout_file_path;
   else if (file_descriptor == '2') redirect_file_path = &stderr_file_path;
   else {
-    printf("Wrong redirect file descriptor provided\n");
+    perror("Wrong redirect file descriptor provided\n");
     exit(1);
   }
 
@@ -39,7 +39,7 @@ void parse_redirect_file_path(char *input, int *i) {
   while (isspace(input[*i]) && input[*i] != '\0') ++(*i);
 
   if (input[*i] == '\0') {
-    printf("Redirect file path wasn't provided\n");
+    perror("Redirect file path wasn't provided\n");
     exit(1);
   }
 
@@ -92,7 +92,7 @@ void parse_argument(char *input, int *i) {
       ++(*i);
 
       if (input[*i] == '\0') {
-        printf("Wrong backslash outside of quotes");
+        perror("Wrong backslash outside of quotes");
         exit(1);
       }
 
@@ -135,8 +135,8 @@ void parse_input(char *input) {
   if (flags_count > 0) {
     flags = realloc(flags, (flags_count + 1)); 
     if (!flags) {
-        perror("Flags realloc failed");
-        exit(1);
+      perror("Flags realloc failed");
+      exit(1);
     }
 
     flags[flags_count] = '\0'; 
@@ -145,8 +145,8 @@ void parse_input(char *input) {
   if (arguments_count > 0) {
     arguments = realloc(arguments, (arguments_count + 1) * sizeof(char*)); 
     if (!arguments) {
-        perror("Arguments realloc failed");
-        exit(1);
+      perror("Arguments realloc failed");
+      exit(1);
     }
 
     arguments[arguments_count] = NULL; 

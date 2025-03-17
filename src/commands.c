@@ -17,38 +17,61 @@ Command get_command_type(char *command) {
   return Unknown;
 }
 
+FILE* open_out_file(char *filepath) {
+  FILE* output_file = stdout; 
+
+  if (stdout_file_path) {
+    output_file = fopen(stdout_file_path, "w");
+    if (!output_file) {
+      perror("Can't open file");
+      exit(1);
+    }
+  }
+
+  return output_file;
+}
+
 void eval_echo() {
   if (arguments_count <= 1) return;
 
+  FILE *output_file = open_out_file(stdout_file_path);
+
   for (int i = 1; i < arguments_count; ++i) {
-    printf("%s ", arguments[i]);
+    fprintf(output_file, "%s ", arguments[i]);
   }
 
-  printf("\n");
+  fprintf(output_file, "\n");
+
+  if (output_file != stdout) fclose(output_file);
 }
 
 void eval_type() {
   char *command = arguments[0];
-  char *first_command_argument = arguments[1];
+
+  FILE *output_file = open_out_file(stdout_file_path);
 
   if (arguments_count != 2) {
-    printf("%s: wrong arguments count\n", command); 
+    fprintf(output_file, "%s: wrong arguments count\n", command); 
     return;
-  } 
+  }
+
+  char *first_command_argument = arguments[1];
 
   Command argument_command_type = get_command_type(first_command_argument);
   
   if (is_builtin(argument_command_type)) {
-    printf("%s is a shell builtin\n", first_command_argument);
+    fprintf(output_file, "%s is a shell builtin\n", first_command_argument);
     return;
   }
 
   char *command_env_path = get_command_from_env_path(first_command_argument);
 
   if (command_env_path) {
-    printf("%s is %s\n", first_command_argument, command_env_path);
+    fprintf(output_file, "%s is %s\n", first_command_argument, command_env_path);
     free(command_env_path);
-  } else printf("%s: not found\n", first_command_argument);
+  } else fprintf(output_file, "%s: not found\n", first_command_argument);
+
+  if (output_file != stdout) fclose(output_file);
 }
 
 void eval_exit() {
@@ -90,8 +113,10 @@ void eval_exit() {
 }
 
 void eval_pwd() {
+  FILE *output_file = open_out_file(stdout_file_path);
+
   if (arguments_count > 1) {
-    printf("%s: no arguments should be passed\n", arguments[0]);
+    fprintf(output_file, "%s: no arguments should be passed\n", arguments[0]);
     return;
   }
 
@@ -102,17 +127,22 @@ void eval_pwd() {
     exit(1);
   } 
   
-  printf("%s\n", pwd);
+  fprintf(output_file, "%s\n", pwd);
+
+  if (output_file != stdout) fclose(output_file);
 }
 
 void eval_cd() {
+  FILE *output_file = open_out_file(stdout_file_path);
+
   char *command = arguments[0];
-  char *first_command_argument = arguments[1];
 
   if (arguments_count != 2) {
-    printf("%s: wrong arguments count\n", command);
+    fprintf(output_file, "%s: wrong arguments count\n", command);
     return;
   }
+
+  char *first_command_argument = arguments[1];
 
   char *dir_to_cd = first_command_argument;
 
@@ -120,7 +150,7 @@ void eval_cd() {
     char *home_path = getenv("HOME");
 
     if (!home_path) {
-      printf("HOME environment variable was not found\n");
+      fprintf(output_file, "HOME environment variable was not found\n");
       return;
     }
 
@@ -129,22 +159,23 @@ void eval_cd() {
 
   char success_flag = chdir(dir_to_cd);
 
-  if (success_flag != 0) printf("%s: %s: No such file or directory\n", command, first_command_argument);
+  if (success_flag != 0) fprintf(output_file, "%s: %s: No such file or directory\n", command, first_command_argument);
+
+  if (output_file != stdout) fclose(output_file);
 }
 
 void eval_unknown_command(char *input) {
-  char *command = arguments[0];
+  FILE *output_file = open_out_file(stdout_file_path);
 
+  char *command = arguments[0];
+  
   char* command_env_path = get_command_from_env_path(command);
   if (!command_env_path) {
-    printf("%s: command not found\n", command);
+    fprintf(output_file, "%s: command not found\n", command);
     return;
   }
 
-  int external_program_status = system(input);
+  if (output_file != stdout) fclose(output_file);
 
-  if (external_program_status != 0) {
-    perror("External program error detected\n");
-    exit(1);
-  }
+  system(input);
 }

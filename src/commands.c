@@ -17,24 +17,31 @@ Command get_command_type(char *command) {
   return Unknown;
 }
 
-FILE* open_out_file(char *filepath) {
-  FILE* output_file = stdout; 
+FILE* get_redirect_file(char *filepath) {
+  FILE* redirect_file = NULL; 
 
-  if (stdout_file_path) {
-    output_file = fopen(stdout_file_path, "w");
-    if (!output_file) {
-      perror("Can't open file");
+  if (filepath) {
+    redirect_file = fopen(filepath, "w");
+    if (!redirect_file) {
+      perror("Can't open output file");
       exit(1);
     }
   }
 
-  return output_file;
+  return redirect_file;
+}
+
+void close_redirect_file(FILE *fp) {
+  if (fp != stdout && fp != stderr) fclose(fp);
 }
 
 void eval_echo() {
   if (arguments_count <= 1) return;
 
-  FILE *output_file = open_out_file(stdout_file_path);
+  FILE *output_file = get_redirect_file(stdout_file_path);
+  if (!output_file) output_file = stdout;
+  FILE *error_file = get_redirect_file(stderr_file_path);
+  if (!error_file) error_file = stderr;
 
   for (int i = 1; i < arguments_count; ++i) {
     fprintf(output_file, "%s ", arguments[i]);
@@ -42,16 +49,22 @@ void eval_echo() {
 
   fprintf(output_file, "\n");
 
-  if (output_file != stdout) fclose(output_file);
+  close_redirect_file(output_file);
+  close_redirect_file(error_file);
 }
 
 void eval_type() {
   char *command = arguments[0];
 
-  FILE *output_file = open_out_file(stdout_file_path);
+  FILE *output_file = get_redirect_file(stdout_file_path);
+  if (!output_file) output_file = stdout;
+  FILE *error_file = get_redirect_file(stderr_file_path);
+  if (!error_file) error_file = stderr;
 
   if (arguments_count != 2) {
-    fprintf(output_file, "%s: wrong arguments count\n", command); 
+    fprintf(error_file, "%s: wrong arguments count\n", command); 
+    close_redirect_file(output_file);
+    close_redirect_file(error_file);
     return;
   }
 
@@ -61,6 +74,8 @@ void eval_type() {
   
   if (is_builtin(argument_command_type)) {
     fprintf(output_file, "%s is a shell builtin\n", first_command_argument);
+    close_redirect_file(output_file);
+    close_redirect_file(error_file);
     return;
   }
 
@@ -69,21 +84,27 @@ void eval_type() {
   if (command_env_path) {
     fprintf(output_file, "%s is %s\n", first_command_argument, command_env_path);
     free(command_env_path);
-  } else fprintf(output_file, "%s: not found\n", first_command_argument);
+  } else fprintf(error_file, "%s: not found\n", first_command_argument);
 
-  if (output_file != stdout) fclose(output_file);
+  close_redirect_file(output_file);
+  close_redirect_file(error_file);
 }
 
 void eval_exit() {
+  FILE *error_file = get_redirect_file(stderr_file_path);
+  if (!error_file) error_file = stderr;
+
   char *command = arguments[0];
 
   if (flags_count != 0) {
-    printf("%s: no flags should be provided\n", command); 
+    fprintf(error_file, "%s: no flags should be provided\n", command); 
+    close_redirect_file(error_file);
     return;
   }
 
   if (arguments_count != 2) {
-    printf("%s: wrong arguments count\n", command); 
+    fprintf(error_file, "%s: wrong arguments count\n", command); 
+    close_redirect_file(error_file);
     return;
   } 
 
@@ -98,25 +119,34 @@ void eval_exit() {
   }
 
   if (!is_arg_a_number) {
-    printf("%s: provide valid status code\n", command);
+    fprintf(error_file, "%s: provide valid status code\n", command);
+    close_redirect_file(error_file);
     return;
   }
 
-  int status_code = atoi(command);
+  int status_code = atoi(first_command_argument);
 
   if (status_code < 0 || status_code > 254) {
-    printf("%s: status code must be between 0 and 254\n", command);
+    fprintf(error_file, "%s: status code must be between 0 and 254\n", command);
+    close_redirect_file(error_file);
     return;
   }
+
+  close_redirect_file(error_file);
 
   exit(status_code);
 }
 
 void eval_pwd() {
-  FILE *output_file = open_out_file(stdout_file_path);
+  FILE *output_file = get_redirect_file(stdout_file_path);
+  if (!output_file) output_file = stdout;
+  FILE *error_file = get_redirect_file(stderr_file_path);
+  if (!error_file) error_file = stderr;
 
   if (arguments_count > 1) {
-    fprintf(output_file, "%s: no arguments should be passed\n", arguments[0]);
+    fprintf(error_file, "%s: no arguments should be passed\n", arguments[0]);
+    close_redirect_file(output_file);
+    close_redirect_file(error_file);
     return;
   }
 
@@ -124,21 +154,26 @@ void eval_pwd() {
 
   if (getcwd(pwd, sizeof(pwd)) == NULL) {
     perror("getcwd error detected");
+    close_redirect_file(output_file);
+    close_redirect_file(error_file);
     exit(1);
   } 
   
   fprintf(output_file, "%s\n", pwd);
 
-  if (output_file != stdout) fclose(output_file);
+  close_redirect_file(output_file);
+  close_redirect_file(error_file);
 }
 
 void eval_cd() {
-  FILE *output_file = open_out_file(stdout_file_path);
+  FILE *error_file = get_redirect_file(stderr_file_path);
+  if (!error_file) error_file = stderr;
 
   char *command = arguments[0];
 
   if (arguments_count != 2) {
-    fprintf(output_file, "%s: wrong arguments count\n", command);
+    fprintf(error_file, "%s: wrong arguments count\n", command);
+    close_redirect_file(error_file);
     return;
   }
 
@@ -150,7 +185,8 @@ void eval_cd() {
     char *home_path = getenv("HOME");
 
     if (!home_path) {
-      fprintf(output_file, "HOME environment variable was not found\n");
+      fprintf(error_file, "HOME environment variable was not found\n");
+      close_redirect_file(error_file);
       return;
     }
 
@@ -158,24 +194,25 @@ void eval_cd() {
   }
 
   char success_flag = chdir(dir_to_cd);
+  if (success_flag != 0) fprintf(error_file, "%s: %s: No such file or directory\n", command, first_command_argument);
 
-  if (success_flag != 0) fprintf(output_file, "%s: %s: No such file or directory\n", command, first_command_argument);
-
-  if (output_file != stdout) fclose(output_file);
+  close_redirect_file(error_file);
 }
 
 void eval_unknown_command(char *input) {
-  FILE *output_file = open_out_file(stdout_file_path);
+  FILE *error_file = get_redirect_file(stderr_file_path);
+  if (!error_file) error_file = stderr;
 
   char *command = arguments[0];
   
   char* command_env_path = get_command_from_env_path(command);
   if (!command_env_path) {
-    fprintf(output_file, "%s: command not found\n", command);
+    fprintf(error_file, "%s: command not found\n", command);
+    close_redirect_file(error_file);
     return;
   }
 
-  if (output_file != stdout) fclose(output_file);
+  close_redirect_file(error_file);
 
   system(input);
 }

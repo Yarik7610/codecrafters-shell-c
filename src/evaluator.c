@@ -14,6 +14,7 @@ void evaluate(char *input) {
       break;
     case Exit:
       eval_exit();
+      break;
     case Pwd:
       eval_pwd();
       break;

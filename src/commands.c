@@ -21,9 +21,9 @@ Command get_command_type(char *command) {
 void eval_echo() {
   if (arguments_count <= 1) return;
 
-  FILE *output_file = get_redirect_file(stdout_file_path);
+  FILE *output_file = get_redirect_file(stdout_file_path, stderr_file_mode);
   if (!output_file) output_file = stdout;
-  FILE *error_file = get_redirect_file(stderr_file_path);
+  FILE *error_file = get_redirect_file(stderr_file_path, stderr_file_mode);
   if (!error_file) error_file = stderr;
 
   for (int i = 1; i < arguments_count; ++i) {
@@ -39,9 +39,9 @@ void eval_echo() {
 void eval_type() {
   char *command = arguments[0];
 
-  FILE *output_file = get_redirect_file(stdout_file_path);
+  FILE *output_file = get_redirect_file(stdout_file_path, stderr_file_mode);
   if (!output_file) output_file = stdout;
-  FILE *error_file = get_redirect_file(stderr_file_path);
+  FILE *error_file = get_redirect_file(stderr_file_path, stderr_file_mode);
   if (!error_file) error_file = stderr;
 
   if (arguments_count != 2) {
@@ -74,7 +74,7 @@ void eval_type() {
 }
 
 void eval_exit() {
-  FILE *error_file = get_redirect_file(stderr_file_path);
+  FILE *error_file = get_redirect_file(stderr_file_path, stderr_file_mode);
   if (!error_file) error_file = stderr;
 
   char *command = arguments[0];
@@ -121,9 +121,9 @@ void eval_exit() {
 }
 
 void eval_pwd() {
-  FILE *output_file = get_redirect_file(stdout_file_path);
+    FILE *output_file = get_redirect_file(stdout_file_path, stderr_file_mode);
   if (!output_file) output_file = stdout;
-  FILE *error_file = get_redirect_file(stderr_file_path);
+  FILE *error_file = get_redirect_file(stderr_file_path, stderr_file_mode);
   if (!error_file) error_file = stderr;
 
   if (arguments_count > 1) {
@@ -149,7 +149,7 @@ void eval_pwd() {
 }
 
 void eval_cd() {
-  FILE *error_file = get_redirect_file(stderr_file_path);
+  FILE *error_file = get_redirect_file(stderr_file_path, stderr_file_mode);
   if (!error_file) error_file = stderr;
 
   char *command = arguments[0];
@@ -183,7 +183,7 @@ void eval_cd() {
 }
 
 void eval_unknown_command(char *input) {
-  FILE *error_file = get_redirect_file(stderr_file_path);
+  FILE *error_file = get_redirect_file(stderr_file_path, stderr_file_mode);
   if (!error_file) error_file = stderr;
 
   char *command = arguments[0];

@@ -11,6 +11,9 @@ extern char **arguments;
 extern int arguments_count;
 
 extern char *stdout_file_path;
+extern char stdout_file_mode[4];
+
 extern char *stderr_file_path;
+extern char stderr_file_mode[4];
 
 #endif

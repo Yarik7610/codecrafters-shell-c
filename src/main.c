@@ -13,7 +13,10 @@ char **arguments = NULL;
 int arguments_count = 0;
 
 char *stdout_file_path = NULL;
+char stdout_file_mode[] = "w";
+
 char *stderr_file_path = NULL;
+char stderr_file_mode[] = "w";
 
 void free_globals();
 
@@ -46,6 +49,7 @@ int main() {
 void free_globals() {
   free(flags);
   flags = NULL;
+  flags_count = 0;
 
   for (int i = 0; i < arguments_count; ++i) {
     free(arguments[i]);
@@ -53,12 +57,13 @@ void free_globals() {
   } 
   free(arguments);
   arguments = NULL;
+  arguments_count = 0;
 
   free(stdout_file_path);
   stdout_file_path = NULL;
+  update_redirect_file_mode(stdout_file_mode, "w");
+
   free(stderr_file_path);
   stderr_file_path = NULL;
-
-  flags_count = 0;
-  arguments_count = 0;
+  update_redirect_file_mode(stderr_file_mode, "w");
 }

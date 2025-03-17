@@ -4,6 +4,7 @@
 #include <ctype.h>
 #include "parser.h"
 #include "main.h"
+#include "utils.h"
 
 int is_in_word_char(char ch) {
   return isalnum(ch) || ch == '_' || ch == '.' || ch == '/' || ch == '-' || ch == '~';
@@ -25,8 +26,13 @@ void parse_flags(char *input, int *i) {
 void parse_redirect_file_path(char *input, int *i) {
   char **redirect_file_path;
   
+  int is_output_descriptor = 0;
+
   char file_descriptor = input[*i];
-  if (file_descriptor == '>' || file_descriptor == '1') redirect_file_path = &stdout_file_path;
+  if (file_descriptor == '>' || file_descriptor == '1') {
+    redirect_file_path = &stdout_file_path;
+    is_output_descriptor = 1;
+  }
   else if (file_descriptor == '2') redirect_file_path = &stderr_file_path;
   else {
     perror("Wrong redirect file descriptor provided\n");
@@ -35,6 +41,12 @@ void parse_redirect_file_path(char *input, int *i) {
 
   int offset = isdigit(file_descriptor) ? 2 : 1;
   (*i) += offset; 
+
+  if (input[*i] == '>') {
+    if (is_output_descriptor) update_redirect_file_mode(stdout_file_mode, "a");
+    else update_redirect_file_mode(stderr_file_mode, "a");
+    ++(*i);
+  }
 
   while (isspace(input[*i]) && input[*i] != '\0') ++(*i);
 

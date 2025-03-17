@@ -7,6 +7,7 @@
 #include "main.h"
 #include "executables.h"
 #include "builtins.h"
+#include "utils.h"
 
 Command get_command_type(char *command) {
   if (strcmp(command, "echo") == 0) return Echo;
@@ -15,24 +16,6 @@ Command get_command_type(char *command) {
   if (strcmp(command, "pwd") == 0) return Pwd;
   if (strcmp(command, "cd") == 0) return Cd;
   return Unknown;
-}
-
-FILE* get_redirect_file(char *filepath) {
-  FILE* redirect_file = NULL; 
-
-  if (filepath) {
-    redirect_file = fopen(filepath, "w");
-    if (!redirect_file) {
-      perror("Can't open output file");
-      exit(1);
-    }
-  }
-
-  return redirect_file;
-}
-
-void close_redirect_file(FILE *fp) {
-  if (fp != stdout && fp != stderr) fclose(fp);
 }
 
 void eval_echo() {

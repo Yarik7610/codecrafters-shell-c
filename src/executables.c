@@ -5,7 +5,6 @@
 #include "executables.h"
 #include "main.h"
 
-
 char* get_command_from_env_path(char *command) {
   char *path = getenv("PATH");
 

@@ -3,7 +3,7 @@
 #include <string.h>
 #include "main.h"
 #include "parser.h"
-#include "trim.h"
+#include "utils.h"
 #include "evaluator.h"
 
 char *flags = NULL;

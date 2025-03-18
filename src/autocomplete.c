@@ -38,11 +38,13 @@ void autocomplete(char *input, int *pos) {
   char *match = NULL;
   
   for (int i = 0; builtins[i] != NULL; ++i) {
-    if (strncmp(word_buffer, builtins[i],  word_len) == 0) {
+    if (strncmp(word_buffer, builtins[i], word_len) == 0) {
       match = builtins[i];
       complete_word(input, pos, word_buffer, match);
-      break;
+      return;
     }
   }
+
+  printf("\a");
 }
 

@@ -1,10 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <termios.h>
 #include "main.h"
 #include "parser.h"
 #include "utils.h"
 #include "evaluator.h"
+#include "stdin.h"
 
 char *flags = NULL;
 int flags_count = 0;
@@ -18,27 +20,52 @@ RedirectFileInfo redirect_err_info = {NULL, "w"};
 void free_globals();
 
 int main() {
+  struct termios orig_termios;
+  enable_raw_mode(&orig_termios);
+
   setbuf(stdout, NULL);
-  
-  char input[MAX_INPUT_SIZE];
+  printf("$ ");
+
+  char input[MAX_INPUT_SIZE] = "";
+  int pos = 0;
+  char ch;
 
   while (1) {
-    printf("$ ");
+    ch = getchar();
 
-    fgets(input, MAX_INPUT_SIZE, stdin);
+    if (ch == EOF || ch == 4)  {
+      printf("\n");
+      break;
+    } else if (ch == '\n') {
+      input[pos] = '\0';
+      putchar('\n');
 
-    input[strlen(input) - 1] = '\0';
+      char *trimmed_input = trim(input);
+      if (*trimmed_input == '\0') continue;
+    
+      parse_input(trimmed_input);
+      evaluate(trimmed_input);
+      free_globals();
 
-    char *trimmed_input = trim(input);
-    if (*trimmed_input == '\0') continue;
-   
-    parse_input(trimmed_input);
-
-    evaluate(trimmed_input);
-
-    free_globals();
+      pos = 0;
+      strcpy(input, "");
+      printf("$ ");
+    } else if (ch == 127 || ch == 8) {
+      if (pos > 0) {
+        input[--pos] = '\0';
+        printf("\b \b");
+      } 
+    } else if (ch == '\t') {
+      printf("AUTOCOMPLETE HERE\n");
+    } else if (ch >= 32 && ch <= 126) {
+      if (pos < MAX_INPUT_SIZE - 1) {
+        input[pos++] = ch;
+        putchar(ch);
+      }
+    }
   }
 
+  disable_raw_mode(&orig_termios);
   return 0;
 }
 

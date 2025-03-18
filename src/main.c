@@ -7,6 +7,7 @@
 #include "utils.h"
 #include "evaluator.h"
 #include "stdin.h"
+#include "autocomplete.h"
 
 char *flags = NULL;
 int flags_count = 0;
@@ -41,7 +42,10 @@ int main() {
       putchar('\n');
 
       char *trimmed_input = trim(input);
-      if (*trimmed_input == '\0') continue;
+      if (*trimmed_input == '\0') {
+        printf("$ ");
+        continue;
+      }
     
       parse_input(trimmed_input);
       evaluate(trimmed_input);
@@ -55,9 +59,8 @@ int main() {
         input[--pos] = '\0';
         printf("\b \b");
       } 
-    } else if (ch == '\t') {
-      printf("AUTOCOMPLETE HERE\n");
-    } else if (ch >= 32 && ch <= 126) {
+    } else if (ch == '\t') autocomplete(input, &pos);
+    else if (ch >= 32 && ch <= 126) {
       if (pos < MAX_INPUT_SIZE - 1) {
         input[pos++] = ch;
         putchar(ch);

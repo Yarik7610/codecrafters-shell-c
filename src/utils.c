@@ -48,7 +48,7 @@ void close_redirect_file(FILE *fp) {
 }
 
 void update_redirect_file_mode(char *file_mode, char *new_mode) {
-  if (strlen(new_mode) > strlen(file_mode)) {
+  if (strlen(new_mode) >= sizeof(file_mode)) {
     fprintf(stderr, "Too long mode string provided\n");
     return;
   }

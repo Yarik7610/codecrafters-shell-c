@@ -12,11 +12,8 @@ int flags_count = 0;
 char **arguments = NULL;
 int arguments_count = 0;
 
-char *stdout_file_path = NULL;
-char stdout_file_mode[] = "w";
-
-char *stderr_file_path = NULL;
-char stderr_file_mode[] = "w";
+RedirectFileInfo redirect_out_info = {NULL, "w"};
+RedirectFileInfo redirect_err_info = {NULL, "w"};
 
 void free_globals();
 
@@ -59,11 +56,11 @@ void free_globals() {
   arguments = NULL;
   arguments_count = 0;
 
-  free(stdout_file_path);
-  stdout_file_path = NULL;
-  update_redirect_file_mode(stdout_file_mode, "w");
+  free(redirect_out_info.path);
+  redirect_out_info.path = NULL;
+  update_redirect_file_mode(&redirect_out_info, "w");
 
-  free(stderr_file_path);
-  stderr_file_path = NULL;
-  update_redirect_file_mode(stderr_file_mode, "w");
+  free(redirect_err_info.path);
+  redirect_err_info.path = NULL;
+  update_redirect_file_mode(&redirect_err_info, "w");
 }

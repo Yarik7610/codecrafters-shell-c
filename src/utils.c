@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "utils.h"
+#include "main.h"
 
 char* ltrim(char *input) {
   if (input == NULL || *input == '\0') return input;
@@ -29,11 +30,11 @@ char* trim(char *input) {
   return rtrim(ltrim(input));
 }
 
-FILE* get_redirect_file(char *file_path, char *file_mode) {
+FILE* get_redirect_file(RedirectFileInfo *redirect_info) {
   FILE* redirect_file = NULL; 
   
-  if (file_path) {
-    redirect_file = fopen(file_path, file_mode);
+  if (redirect_info->path) {
+    redirect_file = fopen(redirect_info->path, redirect_info->mode);
     if (!redirect_file) {
       perror("Can't open output file");
       exit(1);
@@ -47,11 +48,11 @@ void close_redirect_file(FILE *fp) {
   if (fp != stdout && fp != stderr) fclose(fp);
 }
 
-void update_redirect_file_mode(char *file_mode, char *new_mode) {
-  if (strlen(new_mode) >= sizeof(file_mode)) {
+void update_redirect_file_mode(RedirectFileInfo *redirect_info, char *new_mode) {
+  if (strlen(new_mode) >= sizeof(redirect_info->mode)) {
     fprintf(stderr, "Too long mode string provided\n");
     return;
   }
 
-  strcpy(file_mode, new_mode);
+  strcpy(redirect_info->mode, new_mode);
 }

@@ -2,11 +2,12 @@
 #define UTILS_H
 
 #include <stdio.h>
+#include "main.h"
 
 char* trim(char *input);
 
-FILE* get_redirect_file(char *file_path, char *file_mode);
-void update_redirect_file_mode(char *file_mode, char *new_mode);
+FILE* get_redirect_file(RedirectFileInfo *redirect_info);
+void update_redirect_file_mode(RedirectFileInfo *redirect_info, char *new_mode);
 void close_redirect_file(FILE *fp);
 
 #endif

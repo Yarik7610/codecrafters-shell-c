@@ -10,10 +10,12 @@ extern int flags_count;
 extern char **arguments;
 extern int arguments_count;
 
-extern char *stdout_file_path;
-extern char stdout_file_mode[4];
+typedef struct {
+  char *path;
+  char mode[4];
+} RedirectFileInfo;
 
-extern char *stderr_file_path;
-extern char stderr_file_mode[4];
+extern RedirectFileInfo redirect_out_info;
+extern RedirectFileInfo redirect_err_info;
 
 #endif

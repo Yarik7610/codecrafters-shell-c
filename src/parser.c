@@ -24,16 +24,16 @@ void parse_flags(char *input, int *i) {
 }
 
 void parse_redirect_file_path(char *input, int *i) {
-  char **redirect_file_path;
+  RedirectFileInfo *redirect_info;
   
   int is_output_descriptor = 0;
 
   char file_descriptor = input[*i];
   if (file_descriptor == '>' || file_descriptor == '1') {
-    redirect_file_path = &stdout_file_path;
+    redirect_info = &redirect_out_info;
     is_output_descriptor = 1;
   }
-  else if (file_descriptor == '2') redirect_file_path = &stderr_file_path;
+  else if (file_descriptor == '2') redirect_info = &redirect_err_info;
   else {
     perror("Wrong redirect file descriptor provided\n");
     exit(1);
@@ -43,8 +43,8 @@ void parse_redirect_file_path(char *input, int *i) {
   (*i) += offset; 
 
   if (input[*i] == '>') {
-    if (is_output_descriptor) update_redirect_file_mode(stdout_file_mode, "a");
-    else update_redirect_file_mode(stderr_file_mode, "a");
+    if (is_output_descriptor) update_redirect_file_mode(redirect_info, "a");
+    else update_redirect_file_mode(redirect_info, "a");
     ++(*i);
   }
 
@@ -61,17 +61,17 @@ void parse_redirect_file_path(char *input, int *i) {
 
   int file_path_len = *i - file_path_start_idx;
 
-  *redirect_file_path = malloc(file_path_len + 1);
-  if (!*redirect_file_path) {
+  redirect_info->path = malloc(file_path_len + 1);
+  if (!redirect_info->path) {
     perror("Redirect file path malloc failed");
     exit(1);
   }
 
   for (int j = 0; j < file_path_len; ++j) {
-    (*redirect_file_path)[j] = input[file_path_start_idx++];
+    redirect_info->path[j] = input[file_path_start_idx++];
   }
 
-  (*redirect_file_path)[file_path_len] = '\0';
+  redirect_info->path[file_path_len] = '\0';
 }
 
 void parse_argument(char *input, int *i) {

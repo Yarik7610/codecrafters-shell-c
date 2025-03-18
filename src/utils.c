@@ -56,3 +56,16 @@ void update_redirect_file_mode(RedirectFileInfo *redirect_info, char *new_mode) 
 
   strcpy(redirect_info->mode, new_mode);
 }
+
+RedirectFileInfo* get_redirect_file_info(char file_descriptor) {
+  RedirectFileInfo *redirect_info;
+
+  if (file_descriptor == '>' || file_descriptor == '1') redirect_info = &redirect_out_info;
+  else if (file_descriptor == '2') redirect_info = &redirect_err_info;
+  else {
+    perror("Wrong redirect file descriptor provided\n");
+    exit(1);
+  }
+
+  return redirect_info;
+}

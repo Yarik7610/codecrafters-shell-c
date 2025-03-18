@@ -24,27 +24,13 @@ void parse_flags(char *input, int *i) {
 }
 
 void parse_redirect_file_path(char *input, int *i) {
-  RedirectFileInfo *redirect_info;
-  
-  int is_output_descriptor = 0;
+  RedirectFileInfo *redirect_info = get_redirect_file_info(input[*i]);
 
-  char file_descriptor = input[*i];
-  if (file_descriptor == '>' || file_descriptor == '1') {
-    redirect_info = &redirect_out_info;
-    is_output_descriptor = 1;
-  }
-  else if (file_descriptor == '2') redirect_info = &redirect_err_info;
-  else {
-    perror("Wrong redirect file descriptor provided\n");
-    exit(1);
-  }
-
-  int offset = isdigit(file_descriptor) ? 2 : 1;
+  int offset = isdigit(input[*i]) ? 2 : 1;
   (*i) += offset; 
 
   if (input[*i] == '>') {
-    if (is_output_descriptor) update_redirect_file_mode(redirect_info, "a");
-    else update_redirect_file_mode(redirect_info, "a");
+    update_redirect_file_mode(redirect_info, "a");
     ++(*i);
   }
 

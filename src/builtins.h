@@ -3,8 +3,8 @@
 
 #include "commands.h"
 
-extern Command builtins[];
+extern char *builtins[];
 
-int is_builtin(Command command_type);
+int is_builtin(char *command);
 
 #endif

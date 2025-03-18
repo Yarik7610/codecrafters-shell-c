@@ -1,13 +1,12 @@
 #include <stdlib.h>
+#include <string.h>
 #include "builtins.h"
 
-Command builtins[] = {Echo, Exit, Type, Pwd, Cd};
+char *builtins[] = {"echo", "exit", "type", "pwd", "cd", NULL};
 
-int is_builtin(Command command_type) {
-  size_t builtins_len = sizeof(builtins) / sizeof(builtins[0]);
-
-  for (size_t i = 0; i < builtins_len; ++i) {
-    if (builtins[i] == command_type) return 1;
+int is_builtin(char *command) {
+  for (int i = 0; builtins[i] != NULL; ++i) {
+    if (strcmp(builtins[i], command) == 0) return 1;
   }
 
   return 0; 

@@ -8,15 +8,6 @@
 #include "executables.h"
 #include "builtins.h"
 
-Command get_command_type(char *command) {
-  if (strcmp(command, "echo") == 0) return Echo;
-  if (strcmp(command, "exit") == 0) return Exit;
-  if (strcmp(command, "type") == 0) return Type;
-  if (strcmp(command, "pwd") == 0) return Pwd;
-  if (strcmp(command, "cd") == 0) return Cd;
-  return Unknown;
-}
-
 void eval_echo(FILE *output_file) {
   if (arguments_count <= 1) return;
 
@@ -37,9 +28,7 @@ void eval_type(FILE *output_file, FILE *error_file) {
 
   char *first_command_argument = arguments[1];
 
-  Command argument_command_type = get_command_type(first_command_argument);
-  
-  if (is_builtin(argument_command_type)) {
+  if (is_builtin(first_command_argument)) {
     fprintf(output_file, "%s is a shell builtin\n", first_command_argument);
     return;
   }

@@ -1,9 +1,11 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include "autocomplete.h"
 #include "builtins.h"
 #include "main.h"
+#include "executables.h"
 
 void complete_word(char *input, int *pos, char *original_word, char *full_word) {
   int additional_len = strlen(full_word) - strlen(original_word);
@@ -23,28 +25,33 @@ void complete_word(char *input, int *pos, char *original_word, char *full_word) 
 }
 
 void autocomplete(char *input, int *pos) {
-  int word_start_idx = *pos - 1;
+  int uncompleted_start_idx = *pos - 1;
 
-  while (word_start_idx >= 0 && !isspace(input[word_start_idx])) word_start_idx--;
-  word_start_idx++;
+  while (uncompleted_start_idx >= 0 && !isspace(input[uncompleted_start_idx])) uncompleted_start_idx--;
+  uncompleted_start_idx++;
 
-  int word_len = *pos - word_start_idx;
-  if (word_len == 0) return;
+  int uncompleted_len = *pos - uncompleted_start_idx;
+  if (uncompleted_len <= 0) return;
 
-  char word_buffer[MAX_INPUT_SIZE];
-  strncpy(word_buffer, input + word_start_idx, word_len);
-  word_buffer[word_len] = '\0';
+  char uncompleted[MAX_INPUT_SIZE];
+  strncpy(uncompleted, input + uncompleted_start_idx, uncompleted_len);
+  uncompleted[uncompleted_len] = '\0';
 
   char *match = NULL;
-  
-  for (int i = 0; builtins[i] != NULL; ++i) {
-    if (strncmp(word_buffer, builtins[i], word_len) == 0) {
-      match = builtins[i];
-      complete_word(input, pos, word_buffer, match);
-      return;
-    }
+  int match_needs_free = 0;
+
+  match = find_uncompleted_in_builtins(uncompleted, uncompleted_len);
+  if (match) {
+    complete_word(input, pos, uncompleted, match); 
+    return;
+  }
+ 
+  match = find_uncompleted_in_executables(uncompleted, uncompleted_len);
+  if (match) {
+    complete_word(input, pos, uncompleted, match); 
+    free(match);
+    return;
   }
 
   printf("\a");
 }
-

@@ -11,3 +11,17 @@ int is_builtin(char *command) {
 
   return 0; 
 }
+
+char* find_uncompleted_in_builtins(char *uncompleted, int uncompleted_len) {
+  char *match = NULL;
+
+  for (int i = 0; builtins[i] != NULL; ++i) {
+    if (strncmp(uncompleted, builtins[i], uncompleted_len) == 0) {
+      match = builtins[i];
+      return match;
+    }
+  }
+
+  return match;
+}
+

@@ -5,6 +5,7 @@
 #include <dirent.h>
 #include "executables.h"
 #include "main.h"
+#include "autocomplete.h"
 
 char* get_env_path_copy() {
   char *path = getenv("PATH");
@@ -49,19 +50,28 @@ char* get_command_from_env_path(char *command) {
   return NULL;
 }
 
+int is_in_matches(char *word, Matches *matches) {
+  int in_matches = 0;
+  
+  for (int i = 0; i < matches->count; ++i) {
+    if (strcmp(matches->words[i], word) == 0) {
+      in_matches = 1;
+      break;
+    }
+  }
 
-char* find_uncompleted_in_executables(char *uncompleted, int uncompleted_len) {
-  char *match = NULL;
+  return in_matches;
+}
 
+void find_uncompleted_in_executables(char *uncompleted, int uncompleted_len, Matches *matches) {
   char *path_copy = get_env_path_copy();
-  if (!path_copy) return NULL;
+  if (!path_copy) return;
 
   char *splitted_path = strtok(path_copy, ":");
 
   while (splitted_path != NULL) {
     DIR *dir = opendir(splitted_path);
     if (!dir) {
-      closedir(dir);
       splitted_path = strtok(NULL, ":");
       continue;
     }
@@ -70,24 +80,30 @@ char* find_uncompleted_in_executables(char *uncompleted, int uncompleted_len) {
 
     while ((de = readdir(dir)) != NULL) {
       if (strncmp(de->d_name, uncompleted, uncompleted_len) == 0) {
-        match = strdup(de->d_name);
-        if (!match) {
-          perror("Directory entry name malloc failed");
+        int in_matches = is_in_matches(de->d_name, matches);
+        if (in_matches) continue;
+
+        matches->words = realloc(matches->words, (matches->count + 2) * sizeof(char *));
+        if (!matches->words) {
+          perror("Executable matches realloc failed");
           exit(1);
         }
-        break;
+
+        char *match = strdup(de->d_name);
+        if (!match) {
+          perror("Executable match malloc failed");
+          exit(1);
+        }
+
+        matches->words[matches->count++] = match;
+        matches->words[matches->count] = NULL;
       }
     }
 
     closedir(dir);
-
-    if (match != NULL) break;
-
     splitted_path = strtok(NULL, ":");
   }
 
   free(path_copy);
-
-  return match;
 }
 

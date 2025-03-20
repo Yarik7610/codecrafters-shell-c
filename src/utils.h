@@ -11,4 +11,6 @@ RedirectFileInfo* get_redirect_file_info(char file_descriptor);
 void update_redirect_file_mode(RedirectFileInfo *redirect_info, char *new_mode);
 void close_redirect_file(FILE *fp);
 
+int compare_strings(const void *a, const void *b);
+
 #endif

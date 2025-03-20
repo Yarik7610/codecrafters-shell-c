@@ -1,7 +1,9 @@
 #ifndef EXECUTABLES_H
 #define EXECUTABLES_H
 
+#include "autocomplete.h"
+
 char* get_command_from_env_path(char *command);
-char* find_uncompleted_in_executables(char *word_buffer, int word_len);
+void find_uncompleted_in_executables(char *uncompleted, int uncompleted_len, Matches *matches);
 
 #endif

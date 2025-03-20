@@ -28,7 +28,7 @@ int main() {
   printf("$ ");
 
   char input[MAX_INPUT_SIZE] = "";
-  int pos = 0;
+  int pos = 0, tab_press_count = 0;
   char ch;
 
   while (1) {
@@ -52,6 +52,7 @@ int main() {
       free_globals();
 
       pos = 0;
+      tab_press_count = 0;
       strcpy(input, "");
       printf("$ ");
     } else if (ch == 127 || ch == 8) {
@@ -59,7 +60,7 @@ int main() {
         input[--pos] = '\0';
         printf("\b \b");
       } 
-    } else if (ch == '\t') autocomplete(input, &pos);
+    } else if (ch == '\t') autocomplete(input, &pos, &tab_press_count);
     else if (ch >= 32 && ch <= 126) {
       if (pos < MAX_INPUT_SIZE - 1) {
         input[pos++] = ch;

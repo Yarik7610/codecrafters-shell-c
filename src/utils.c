@@ -69,3 +69,10 @@ RedirectFileInfo* get_redirect_file_info(char file_descriptor) {
 
   return redirect_info;
 }
+
+int compare_strings(const void *a, const void *b) {
+  const char *pa = *(const char **) a;
+  const char *pb = *(const char **) b;
+
+  return strcmp(pa, pb);
+}

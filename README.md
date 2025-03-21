@@ -17,11 +17,6 @@ interpreting shell commands, running external programs and builtin commands like
 - autocompletion for builtins and executable commands (multiple matches will be printed as in bash, one match will be autocompleted)
 - partial completion if there was found bigger common prefix of all matches
 
-# My own features (some are in work right now)
-
-- extra key bindings (Ctrl + D, left / right arrows for cursor move (in work))
-- command buffer (top / bottom arrows) (in work)
-
 # How to run
 
 1. Ensure you have `cmake` installed locally

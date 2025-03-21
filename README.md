@@ -21,3 +21,7 @@ interpreting shell commands, running external programs and builtin commands like
 
 1. Ensure you have `cmake` installed locally
 2. Run `./your_program.sh` to run your program
+
+# Comment
+
+This task was pretty interesting to realize, the main goal of the project was to gain some practical skills in C after reading the original book. It was fun to use some C functions to interact with OS directly (chdir, termios, access, getenv, getpwd, exit, system). Big thanks CodeCrafters (https://codecrafters.io/) for a such challenge)  

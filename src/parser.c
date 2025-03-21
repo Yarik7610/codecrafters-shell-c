@@ -6,10 +6,6 @@
 #include "main.h"
 #include "utils.h"
 
-int is_in_word_char(char ch) {
-  return isalnum(ch) || ch == '_' || ch == '.' || ch == '/' || ch == '-' || ch == '~';
-}
-
 void parse_flags(char *input, int *i) {
   ++(*i);
   for (; isalnum(input[*i]) && input[*i] != '\0'; ++(*i)) {
@@ -66,7 +62,7 @@ void parse_argument(char *input, int *i) {
   char temp_arg[MAX_INPUT_SIZE];
   int temp_index = 0;
 
-  while (input[*i] != '\0') {
+  while (input[*i] != '\0' && !isspace(input[*i])) {
     if (input[*i] == '\'' || input[*i] == '\"') {
       quote_char = input[(*i)++];
 
@@ -85,7 +81,7 @@ void parse_argument(char *input, int *i) {
         exit(1);
       }
 
-    } else if (is_in_word_char(input[*i])) temp_arg[temp_index++] = input[(*i)++];
+    } 
     else if (input[*i] == '\\') {
       ++(*i);
 
@@ -96,7 +92,7 @@ void parse_argument(char *input, int *i) {
 
       temp_arg[temp_index++] = input[(*i)++];
     }
-    else break;
+    else temp_arg[temp_index++] = input[(*i)++];
   }
 
   temp_arg[temp_index] = '\0';
